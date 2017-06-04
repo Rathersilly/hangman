@@ -1,4 +1,3 @@
-
 class Game
   MAX_GUESSES = 6
   BODY_PARTS = ["     O",
@@ -14,7 +13,8 @@ class Game
     @wrong_guesses = 0
     @win_status = nil
     @guess = ""
-    @guessed_letters = []
+    @correct_letters = []
+    @wrong_letters = []
     @word_so_far
     play_game
 
@@ -27,15 +27,16 @@ class Game
       guess = get_guess
       update_letters
       puts @win_status
-
+      puts "word was #{@word}"
       
     end
   end
 
   def choose_word(min=5, max = 12)
-#    File.foreach(@dictionary_file).each_with_index do |line, number|
-#      chosen_word = line if rand < 1.0/(number + 1)
-#    end
+    #    this is an alternative way of doing what.sample does
+    #    File.foreach(@dictionary_file).each_with_index do |line, number|
+    #      chosen_word = line if rand < 1.0/(number + 1)
+    #    end
     @word = File.readlines(@dictionary_file).sample.strip.upcase
     @word_so_far = "_" * @word.length
     #puts @word
@@ -44,9 +45,8 @@ class Game
 
 
   def get_guess
-    puts "Guess a letter:"
+    print "Guess a letter: "
     @guess = gets.chomp.upcase
-    @guessed_letters.push(@guess)
  
   end
 
@@ -58,7 +58,13 @@ class Game
         correct_guess_flag = true
       end
     end
-    @wrong_guesses += 1 if correct_guess_flag == false
+    if correct_guess_flag == false
+      @wrong_guesses += 1
+      @wrong_letters.push(@guess) unless @wrong_letters.include?(@guess)
+    else
+      @correct_letters.push(@guess) unless @correct_letters.include?(@guess)
+    end
+
     if @word_so_far == @word
       @win_status = :win
       return
@@ -84,7 +90,12 @@ class Game
     @word_so_far.length.times do |i|
       print @word_so_far[i] + " "
     end
-    puts
+    
+    if @wrong_guesses > 0
+      puts "     wrong guesses: #{@wrong_letters.join.downcase}"
+    else
+      puts
+    end
 
   end
 
