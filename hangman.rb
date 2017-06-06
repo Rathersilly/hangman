@@ -10,6 +10,7 @@ class Game
 
   def initialize
     @dictionary_file = "5desk.txt"
+    @word = ""
     @wrong_guesses = 0
     @win_status = nil
     @guess = ""
@@ -26,10 +27,14 @@ class Game
       show_man
       guess = get_guess
       update_letters
-      puts @win_status
-      puts "word was #{@word}"
       
     end
+    if @win_status == :win
+      puts "You guessed the word! Dude is saved!"
+    else
+      puts "Guy ded.  Word was #{@word}."
+    end
+
   end
 
   def choose_word(min=5, max = 12)
@@ -37,7 +42,10 @@ class Game
     #    File.foreach(@dictionary_file).each_with_index do |line, number|
     #      chosen_word = line if rand < 1.0/(number + 1)
     #    end
-    @word = File.readlines(@dictionary_file).sample.strip.upcase
+    while @word.length < 5 ||  @word.length > 12
+      @word = File.readlines(@dictionary_file).sample.strip.upcase
+      puts @word
+    end
     @word_so_far = "_" * @word.length
     #puts @word
   end
@@ -46,6 +54,8 @@ class Game
 
   def get_guess
     print "Guess a letter: "
+    @guess = ""
+    #need to add sanitization and possibility of save/load commands
     @guess = gets.chomp.upcase
  
   end
@@ -98,6 +108,12 @@ class Game
     end
 
   end
+
+  def save
+  end
+  def load
+  end
+
 
 end
 
