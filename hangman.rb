@@ -1,3 +1,5 @@
+require 'yaml'
+
 class Game
   MAX_GUESSES = 6
   BODY_PARTS = ["     O",
@@ -9,6 +11,11 @@ class Game
 
 
   def initialize
+    setup
+
+  end
+  
+  def setup
     @dictionary_file = "5desk.txt"
     @word = ""
     @wrong_guesses = 0
@@ -16,23 +23,26 @@ class Game
     @guess = ""
     @correct_letters = []
     @wrong_letters = []
-    @word_so_far
+    @word_so_far = ""
     play_game
-
   end
-  
+
   def play_game
     choose_word
     while(@win_status == nil)
       show_man
-      guess = get_guess
+      get_guess
       update_letters
       
     end
+    #@win_status can also = :load.  should refactor a new game_controller class
     if @win_status == :win
       puts "You guessed the word! Dude is saved!"
-    else
+    elsif @win_status == :loss
       puts "Guy ded.  Word was #{@word}."
+    elsif @win_status == :quit
+      puts "OK Bye!"
+    
     end
 
   end
@@ -53,12 +63,31 @@ class Game
 
 
   def get_guess
-    print "Guess a letter: "
     @guess = ""
     #need to add sanitization and possibility of save/load commands
-    @guess = gets.chomp.upcase
- 
+    while true
+      print 'Type "save", "load", "quit" or Guess a letter: '
+      @guess = gets.chomp.upcase
+      if @guess == "SAVE"
+        save_game
+        
+      elsif @guess == "LOAD"
+        load_game
+      elsif @guess == "QUIT"
+        quit_game
+        break
+      elsif @wrong_letters.include?(@guess) || @correct_letters.include?(@guess)
+        puts "You already guessed that letter."
+      elsif @guess.length == 1 && @guess =~ /\w/
+        break
+      else
+        puts "Please enter something valid!"
+      end
+
+    end
+    
   end
+
 
   def update_letters
     correct_guess_flag = false
@@ -109,9 +138,14 @@ class Game
 
   end
 
-  def save
+  def save_game
+    puts YAML::dump(self)
   end
-  def load
+  def load_game
+    setup
+  end
+  def quit_game
+    @win_status = :quit
   end
 
 
