@@ -1,0 +1,4 @@
+refactor plan
+
+new class game_controller
+make instances of game from game_controller
